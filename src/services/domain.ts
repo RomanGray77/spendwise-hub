@@ -66,7 +66,10 @@ export function defaultRange(now: Date = new Date()): DateRange {
   return { startDate: `${now.getFullYear()}-01-01`, endDate: todayISO(now) };
 }
 
-export function inRange(t: Transaction, range: Partial<DateRange>): boolean {
+export function inRange(
+  t: Transaction,
+  range: { startDate?: string | undefined; endDate?: string | undefined },
+): boolean {
   if (range.startDate && t.date < range.startDate) return false;
   if (range.endDate && t.date > range.endDate) return false;
   return true;
