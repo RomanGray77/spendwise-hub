@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as CategoriesIndexRouteImport } from './routes/categories/index'
+import { Route as CategoriesCategoryIdRouteImport } from './routes/categories/$categoryId'
 import { Route as TransactionsNewRouteImport } from './routes/transactions/new'
 
 const IndexRoute = IndexRouteImport.update({
@@ -29,6 +30,11 @@ const CategoriesIndexRoute = CategoriesIndexRouteImport.update({
   path: '/categories/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CategoriesCategoryIdRoute = CategoriesCategoryIdRouteImport.update({
+  id: '/categories/$categoryId',
+  path: '/categories/$categoryId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TransactionsNewRoute = TransactionsNewRouteImport.update({
   id: '/transactions/new',
   path: '/transactions/new',
@@ -38,12 +44,14 @@ const TransactionsNewRoute = TransactionsNewRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/categories/$categoryId': typeof CategoriesCategoryIdRoute
   '/transactions/new': typeof TransactionsNewRoute
   '/categories/': typeof CategoriesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/categories/$categoryId': typeof CategoriesCategoryIdRoute
   '/transactions/new': typeof TransactionsNewRoute
   '/categories': typeof CategoriesIndexRoute
 }
@@ -51,20 +59,38 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/categories/$categoryId': typeof CategoriesCategoryIdRoute
   '/transactions/new': typeof TransactionsNewRoute
   '/categories/': typeof CategoriesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/transactions/new' | '/categories/'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/categories/$categoryId'
+    | '/transactions/new'
+    | '/categories/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/transactions/new' | '/categories'
-  id: '__root__' | '/' | '/login' | '/transactions/new' | '/categories/'
+  to:
+    | '/'
+    | '/login'
+    | '/categories/$categoryId'
+    | '/transactions/new'
+    | '/categories'
+  id:
+    | '__root__'
+    | '/'
+    | '/login'
+    | '/categories/$categoryId'
+    | '/transactions/new'
+    | '/categories/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   LoginRoute: typeof LoginRoute
+  CategoriesCategoryIdRoute: typeof CategoriesCategoryIdRoute
   TransactionsNewRoute: typeof TransactionsNewRoute
   CategoriesIndexRoute: typeof CategoriesIndexRoute
 }
@@ -92,6 +118,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CategoriesIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/categories/$categoryId': {
+      id: '/categories/$categoryId'
+      path: '/categories/$categoryId'
+      fullPath: '/categories/$categoryId'
+      preLoaderRoute: typeof CategoriesCategoryIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/transactions/new': {
       id: '/transactions/new'
       path: '/transactions/new'
@@ -105,6 +138,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LoginRoute: LoginRoute,
+  CategoriesCategoryIdRoute: CategoriesCategoryIdRoute,
   TransactionsNewRoute: TransactionsNewRoute,
   CategoriesIndexRoute: CategoriesIndexRoute,
 }

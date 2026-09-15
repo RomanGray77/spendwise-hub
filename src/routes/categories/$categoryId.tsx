@@ -31,8 +31,8 @@ export const Route = createFileRoute("/categories/$categoryId")({
   validateSearch: (search: Record<string, unknown>) => {
     const fallback = defaultRange();
     return {
-      startDate: typeof search.startDate === "string" ? search.startDate : fallback.startDate,
-      endDate: typeof search.endDate === "string" ? search.endDate : fallback.endDate,
+      startDate: typeof search["startDate"] === "string" ? search["startDate"] : fallback.startDate,
+      endDate: typeof search["endDate"] === "string" ? search["endDate"] : fallback.endDate,
     };
   },
   head: () => ({
