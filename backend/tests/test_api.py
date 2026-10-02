@@ -45,12 +45,31 @@ def test_seeded_transactions_and_summary(client, auth_headers):
     assert summary["netBalanceCents"] == summary["totalIncomeCents"] + summary["totalExpenseCents"]
 
 
-def test_seeded_category_ids_are_stable():
-    from app.store import Store
+def test_data_persists_when_app_reconnects_to_database(tmp_path):
+    from fastapi.testclient import TestClient
+    from app.main import create_app
 
-    first = {category.name: category.id for category in Store().categories.values()}
-    second = {category.name: category.id for category in Store().categories.values()}
-    assert first == second
+    database_url = f"sqlite:///{tmp_path / 'persistent.db'}"
+    with TestClient(create_app(database_url)) as first_client:
+        first_client.post("/auth/login", json={"username": "demo", "password": "spendboard"})
+        created = first_client.post("/categories", json={"name": "Books"})
+        assert created.status_code == 201
+
+    with TestClient(create_app(database_url)) as second_client:
+        second_client.post("/auth/login", json={"username": "demo", "password": "spendboard"})
+        names = {item["name"] for item in second_client.get("/categories").json()}
+        assert "Books" in names
+
+
+def test_database_url_environment_variable_is_used(tmp_path, monkeypatch):
+    from fastapi.testclient import TestClient
+    from app.main import create_app
+
+    database_path = tmp_path / "configured.db"
+    monkeypatch.setenv("DATABASE_URL", f"sqlite:///{database_path}")
+    with TestClient(create_app()) as configured_client:
+        assert configured_client.get("/health").status_code == 200
+    assert database_path.exists()
 
 
 def test_category_crud_and_in_use_conflict(client, auth_headers):

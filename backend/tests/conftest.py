@@ -1,14 +1,14 @@
 import pytest
 from fastapi.testclient import TestClient
 
-from app import main
-from app.store import Store
+from app.main import create_app
 
 
 @pytest.fixture
-def client():
-    main.store = Store()
-    return TestClient(main.app)
+def client(tmp_path):
+    app = create_app(f"sqlite:///{tmp_path / 'test.db'}")
+    with TestClient(app) as test_client:
+        yield test_client
 
 
 @pytest.fixture
