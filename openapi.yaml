@@ -10,8 +10,8 @@ info:
     values in responses are integer cents; transaction input accepts a decimal
     string amount so the backend can apply the same validation as the form.
 servers:
-  - url: /
-    description: Current origin
+  - url: http://127.0.0.1:8090
+    description: Local development server
 tags:
   - name: Authentication
   - name: Categories

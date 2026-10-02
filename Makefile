@@ -3,7 +3,7 @@ SHELL := /bin/bash
 UV ?= uv
 NPM ?= npm
 HOST ?= 127.0.0.1
-BACKEND_PORT ?= 8000
+BACKEND_PORT ?= 8090
 FRONTEND_PORT ?= 5173
 
 BACKEND_DIR := backend
