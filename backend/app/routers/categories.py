@@ -14,6 +14,14 @@ def list_categories(store: Store = Depends(get_store)) -> list[Category]:
     return sorted(store.categories.values(), key=lambda item: item.name.casefold())
 
 
+@router.get("/{categoryId}", response_model=Category)
+def get_category(categoryId: str, store: Store = Depends(get_store)) -> Category:
+    category = store.categories.get(categoryId)
+    if category is None:
+        raise HTTPException(status_code=404, detail="Category not found.")
+    return category
+
+
 @router.post("", response_model=Category, status_code=201)
 def create_category(payload: CategoryInput, store: Store = Depends(get_store)) -> Category:
     if any(item.name.casefold() == payload.name.casefold() for item in store.categories.values()):

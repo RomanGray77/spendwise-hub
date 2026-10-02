@@ -116,6 +116,21 @@ paths:
   /categories/{categoryId}:
     parameters:
       - $ref: '#/components/parameters/CategoryId'
+    get:
+      tags: [Categories]
+      summary: Get a category
+      operationId: getCategory
+      responses:
+        '200':
+          description: Category details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
     patch:
       tags: [Categories]
       summary: Rename a category

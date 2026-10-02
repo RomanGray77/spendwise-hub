@@ -30,13 +30,27 @@ def test_bad_credentials(client):
 
 def test_seeded_transactions_and_summary(client, auth_headers):
     transactions = client.get("/transactions", headers=auth_headers).json()
-    assert len(transactions) >= 5
+    assert len(transactions) == 11
     categories = {item["name"]: item["id"] for item in client.get("/categories", headers=auth_headers).json()}
+    assert set(categories) == {"Food", "Transport", "Housing", "Salary", "Entertainment", "Other"}
+    assert client.get(f"/categories/{categories['Food']}", headers=auth_headers).json()["name"] == "Food"
     food = client.get(f"/transactions?categoryId={categories['Food']}", headers=auth_headers).json()
+    assert len(food) == 3
     assert all(item["categoryId"] == categories["Food"] for item in food)
     result = client.get("/summary", params={"startDate": f"{date.today().year}-01-01", "endDate": f"{date.today().year}-12-31"}, headers=auth_headers)
     assert result.status_code == 200
-    assert result.json()["netBalanceCents"] == result.json()["totalIncomeCents"] + result.json()["totalExpenseCents"]
+    summary = result.json()
+    assert summary["totalIncomeCents"] == 992000
+    assert summary["totalExpenseCents"] == -401520
+    assert summary["netBalanceCents"] == summary["totalIncomeCents"] + summary["totalExpenseCents"]
+
+
+def test_seeded_category_ids_are_stable():
+    from app.store import Store
+
+    first = {category.name: category.id for category in Store().categories.values()}
+    second = {category.name: category.id for category in Store().categories.values()}
+    assert first == second
 
 
 def test_category_crud_and_in_use_conflict(client, auth_headers):

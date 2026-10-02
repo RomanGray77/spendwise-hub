@@ -1,6 +1,6 @@
 from collections import defaultdict
 from datetime import date, datetime, timezone
-from uuid import uuid4
+from uuid import NAMESPACE_URL, uuid4, uuid5
 
 from app.models import Category, CategorySummary, Summary, Transaction, TransactionInput, User
 
@@ -24,18 +24,24 @@ class Store:
         names = ["Food", "Transport", "Housing", "Salary", "Entertainment", "Other"]
         category_ids: dict[str, str] = {}
         for name in names:
-            category_id = str(uuid4())
+            # Stable demo IDs keep overview links valid when the development
+            # server reloads and recreates this process-local store.
+            category_id = str(uuid5(NAMESPACE_URL, f"spendboard:category:{name.casefold()}"))
             category_ids[name] = category_id
             self.categories[category_id] = Category(id=category_id, name=name, createdAt=now)
 
         year = date.today().year
         sample_rows = [
             ("Monthly salary", 450000, date(year, 1, 31), "Salary", "Employer payout"),
+            ("Monthly salary", 450000, date(year, 2, 28), "Salary", ""),
             ("Freelance project", 92000, date(year, 3, 12), "Other", "Logo redesign"),
             ("Rent", -180000, date(year, 1, 5), "Housing", ""),
+            ("Rent", -180000, date(year, 2, 5), "Housing", ""),
             ("Groceries", -14250, date(year, 2, 9), "Food", ""),
+            ("Groceries", -11080, date(year, 3, 2), "Food", ""),
             ("Dinner out", -7550, date(year, 3, 8), "Food", "Birthday"),
             ("Metro pass", -4500, date(year, 2, 1), "Transport", ""),
+            ("Taxi", -2340, date(year, 3, 15), "Transport", ""),
             ("Cinema", -1800, date(year, 3, 20), "Entertainment", ""),
         ]
         for name, amount, tx_date, category, note in sample_rows:

@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, getRouteApi, Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { ArrowLeft, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
@@ -55,9 +55,13 @@ export const Route = createFileRoute("/categories/$categoryId")({
   component: CategoryDetailsPage,
 });
 
+// TanStack Start moves this component into a lazy chunk. Looking the route up
+// by ID keeps that chunk from importing Route back from its definition module.
+const categoryDetailsRoute = getRouteApi("/categories/$categoryId");
+
 function CategoryDetailsPage() {
-  const { categoryId } = Route.useParams();
-  const { startDate, endDate } = Route.useSearch();
+  const { categoryId } = categoryDetailsRoute.useParams();
+  const { startDate, endDate } = categoryDetailsRoute.useSearch();
   const [categories, setCategories] = useState<Category[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [editing, setEditing] = useState<Transaction | null>(null);
