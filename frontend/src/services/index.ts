@@ -1,12 +1,10 @@
-import { createMockService } from "./mockService";
+import { createApiService } from "./apiService";
 import type { SpendBoardService } from "./types";
 
-/**
- * Single access point for every backend call in the app.
- * Replace this with a real API client implementing SpendBoardService.
- */
-export const spendBoard: SpendBoardService = createMockService();
+/** Single access point for every backend call in the app. */
+export const spendBoard: SpendBoardService = createApiService();
 
 export * from "./types";
 export * from "./domain";
-export { createMockService };
+export { createApiService };
+export { createMockService } from "./mockService";
