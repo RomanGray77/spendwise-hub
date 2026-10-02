@@ -1,6 +1,19 @@
 from datetime import date
 
 
+def test_local_frontend_origin_is_allowed(client):
+    response = client.options(
+        "/auth/me",
+        headers={
+            "Origin": "http://localhost:8080",
+            "Access-Control-Request-Method": "GET",
+        },
+    )
+    assert response.status_code == 200
+    assert response.headers["access-control-allow-origin"] == "http://localhost:8080"
+    assert response.headers["access-control-allow-credentials"] == "true"
+
+
 def test_login_and_protected_access(client, auth_headers):
     assert client.get("/auth/me", headers=auth_headers).json() == {"id": "user-1", "username": "demo"}
     assert client.get("/categories", headers=auth_headers).status_code == 200

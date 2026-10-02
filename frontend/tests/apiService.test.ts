@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { createApiService } from "@/services/apiService";
 import { ServiceError } from "@/services/types";
@@ -10,7 +10,25 @@ function jsonResponse(body: unknown, status = 200): Response {
   });
 }
 
+afterEach(() => {
+  vi.unstubAllGlobals();
+});
+
 describe("API service", () => {
+  it("uses the browser hostname for the local backend", async () => {
+    const fetchMock = vi.fn<typeof fetch>().mockResolvedValue(jsonResponse(null));
+    vi.stubGlobal("window", { location: { protocol: "http:", hostname: "localhost" } });
+    vi.stubGlobal("fetch", fetchMock);
+    const service = createApiService();
+
+    await service.getCurrentUser();
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      "http://localhost:8090/auth/me",
+      expect.objectContaining({ credentials: "include" }),
+    );
+  });
+
   it("uses the backend with cookie credentials", async () => {
     const fetchMock = vi
       .fn<typeof fetch>()

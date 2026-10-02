@@ -15,20 +15,49 @@ export function AppLayout({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [ready, setReady] = useState(false);
+  const [authError, setAuthError] = useState("");
+  const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
     let active = true;
-    spendBoard.getCurrentUser().then((user) => {
-      if (!active) return;
-      if (!user) navigate({ to: "/login" });
-      else setReady(true);
-    });
+    setAuthError("");
+    spendBoard
+      .getCurrentUser()
+      .then((user) => {
+        if (!active) return;
+        if (!user) navigate({ to: "/login" });
+        else setReady(true);
+      })
+      .catch((error: unknown) => {
+        if (!active) return;
+        setAuthError(
+          error instanceof Error ? error.message : "Unable to connect to the SpendBoard server.",
+        );
+      });
     return () => {
       active = false;
     };
-  }, [navigate]);
+  }, [navigate, retryCount]);
 
   if (!ready) {
+    if (authError) {
+      return (
+        <div className="flex min-h-screen items-center justify-center px-5">
+          <div className="max-w-md rounded-2xl border border-border bg-card p-6 text-center shadow-sm">
+            <h1 className="text-lg font-semibold">Backend unavailable</h1>
+            <p role="alert" className="mt-2 text-sm text-muted-foreground">
+              {authError}
+            </p>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Make sure the SpendBoard backend is running on port 8090.
+            </p>
+            <Button className="mt-5" onClick={() => setRetryCount((count) => count + 1)}>
+              Retry
+            </Button>
+          </div>
+        </div>
+      );
+    }
     return (
       <div className="flex min-h-screen items-center justify-center text-muted-foreground">
         Loading…

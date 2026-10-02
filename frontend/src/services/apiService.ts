@@ -10,13 +10,20 @@ import type {
 } from "./types";
 import { ServiceError } from "./types";
 
-const DEFAULT_API_BASE_URL = "http://127.0.0.1:8090";
+const LOCAL_API_PORT = 8090;
 
 type Fetch = typeof globalThis.fetch;
 
 interface ApiErrorBody {
   message?: unknown;
   detail?: unknown;
+}
+
+function defaultApiBaseUrl(): string {
+  if (typeof window !== "undefined") {
+    return `${window.location.protocol}//${window.location.hostname}:${LOCAL_API_PORT}`;
+  }
+  return `http://127.0.0.1:${LOCAL_API_PORT}`;
 }
 
 function errorMessage(body: unknown, fallback: string): string {
@@ -29,7 +36,7 @@ function errorMessage(body: unknown, fallback: string): string {
 
 /** HTTP implementation of the SpendBoard service contract. */
 export function createApiService(
-  baseUrl = import.meta.env.VITE_API_BASE_URL || DEFAULT_API_BASE_URL,
+  baseUrl = import.meta.env.VITE_API_BASE_URL || defaultApiBaseUrl(),
   fetchImpl: Fetch = globalThis.fetch,
 ): SpendBoardService {
   const root = baseUrl.replace(/\/$/, "");
